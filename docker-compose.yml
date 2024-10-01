@@ -1,0 +1,16 @@
+version: '3'
+services:
+    redis:
+        image: redis:7.0
+        container_name: redis
+        expose:
+            - 6379
+        volumes:
+            - ./config/redis.conf:/redis.conf
+        command: [ "redis-server", "/redis.conf" ]
+
+    api:
+        build: .
+        container_name: fastapi
+        ports:
+            - "127.0.0.1:8000:8000"

@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+</head>
+
+
+<body>
+
+    <div class="w3-container">
+        <h2>ISO filtering</h2>
+
+        <div class="w3-card-4">
+            <div class="w3-container w3-gray">
+                <h2>Input form</h2>
+            </div>
+
+            <form class="w3-container">
+                    <input id="input_countries" class="w3-input w3-border" type="text" placeholder="Country series">
+                    <label>Please provide the countries to be flitered against the ISO, separate them by commas. </label>
+                
+                
+                    <input id="input_iso" class="w3-input w3-border" type="text" placeholder="iso-2 or iso-3 country code">
+                
+
+
+                <button id="but"  type="button" class = "w3-btn w3-black w3-hover-gray w3-block" pys-onClick="execute">Filter</button>
+
+                <p>
+                <div class="w3-panel w3-white">
+                    <p id="output_element"></p>
+                </div>
+                </p>
+            </form>
+
+
+        </div>
+
+</body>
+
+<py-script>
+    from pyodide.http import pyfetch
+    import asyncio
+    import json
+
+    input_countries = Element("input_countries")
+    input_iso = Element("input_iso")
+    output = Element("output_element")
+
+
+    async def execute(*args, **kwargs):
+        myobj = {
+            "iso": input_iso.value,
+            "countries": [ s.lstrip() for s in input_countries.value.split(',') ]
+        }
+        try:
+            response = await pyfetch(
+                url="http://127.0.0.1:8000/match_country",
+                method="POST",
+                headers={"Content-Type": "application/json"},
+                body=json.dumps(myobj)
+            )
+            if response.ok:
+                data = await response.json()
+                output.write(data)
+        except JsException:
+            return None
+
+</py-script>
+</html>
